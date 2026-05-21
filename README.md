@@ -1,36 +1,61 @@
-# Proyecto: Tienda Online de Mystery Boxes
+# Mystery Boxes Peru
 
-## 1. Descripción General
-Este proyecto consiste en el desarrollo de un E-commerce especializado en la venta de "Cajas Misteriosas" (Mystery Boxes). El valor diferencial reside en la "economía de la sorpresa", ofreciendo a los usuarios cajas temáticas (Gamer, Tech, Beauty) con productos curados cuyo valor comercial supera el precio de la caja, basándose en un sistema transparente de probabilidades de premios.
+E-commerce platform for themed mystery boxes (Gamer, Tech, Beauty).
 
-## 2. Modelo de Negocio y Tecnología (Fase 01)
-* **Modelo:** B2C (Business-to-Consumer). Venta directa al cliente.
-* **Tecnología:** WordPress con WooCommerce.
-* **Sustento:** Se utiliza este CMS por su flexibilidad, rapidez de implementación y robustez en la gestión de inventarios y pasarelas de pago.
-* **Repositorio:** GitHub (Organización del proyecto).
+## Stack
 
-## 3. Requisitos Funcionales (Fase 02)
-* **Gestión de Catálogo:** Creación de categorías y niveles de rareza.
-* **Detalle de Producto:** Visualización de tablas de probabilidades.
-* **Sistema de Suscripciones:** Compras únicas o recurrentes.
-* **Carrito y Cupones:** Gestión de productos y descuentos de marketing.
-* **Checkout y Envío:** Cálculo logístico en tiempo real.
-* **Pasarela de Pagos:** Integración con Tarjetas y PayPal.
-* **Gestión de Usuarios:** Registro, login y panel "Mi Perfil".
-* **Panel de Administración:** Control total de productos, probabilidades y stock del inventario.
+- **Frontend:** Next.js 14 (App Router) · TypeScript · Tailwind CSS · Framer Motion · Recharts · NextAuth.js
+- **Backend:** Node.js · Express · TypeScript · Prisma ORM
+- **Database:** PostgreSQL
+- **Queue:** BullMQ + Redis
+- **Package manager:** pnpm workspaces
 
-## 4. Arquitectura de Información (Fase 03)
-La plataforma se divide en cuatro niveles estructurales:
-* **Nivel Público:** Home, Catálogo, Detalle de Caja y FAQ.
-* **Nivel Transaccional:** Carrito, Checkout y Confirmación.
-* **Nivel de Usuario:** Mi Perfil, Gestión de Suscripciones y Direcciones.
-* **Nivel Administrativo:** Dashboard de ventas y Configuración de Cajas.
+## Prerequisites
 
-## 5. Flujo de Usuario (Userflow)
-El flujo principal (*Happy Path*) guía al usuario desde la elección de una temática (ej. Gamer), la revisión de las posibles sorpresas y probabilidades, la elección de la modalidad de compra, el proceso de pago seguro y la visualización de la página de éxito con el número de seguimiento.
+- Node.js 18+
+- pnpm 8+ (`npm install -g pnpm`)
+- PostgreSQL running locally
+- Redis running locally
 
-## 6. Prototipado (Fase 04)
-Diseño UI desarrollado en Figma con layout Web Desktop, optimizando la cuadrícula de productos (4 columnas) para una mejor experiencia visual en computadoras de escritorio.
+## Setup
 
----
-*Desarrollado para el Laboratorio de Nivelación Intensiva.*
+### 1. Install dependencies
+
+```bash
+pnpm install
+```
+
+### 2. Configure environment variables
+
+**Frontend** — create `frontend/.env.local`:
+
+```
+NEXT_PUBLIC_API_URL=http://localhost:4000/api/v1
+NEXTAUTH_SECRET=change-me-in-production
+NEXTAUTH_URL=http://localhost:3000
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+```
+
+**Backend** — create `backend/.env`:
+
+```
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/mystery_boxes
+JWT_SECRET=change-me-in-production
+PORT=4000
+REDIS_URL=redis://localhost:6379
+```
+
+### 3. Run database migration
+
+```bash
+pnpm --filter backend prisma:migrate
+```
+
+### 4. Start development servers
+
+```bash
+pnpm dev           # both in parallel
+pnpm dev:front     # frontend only → http://localhost:3000
+pnpm dev:back      # backend only  → http://localhost:4000
+```
