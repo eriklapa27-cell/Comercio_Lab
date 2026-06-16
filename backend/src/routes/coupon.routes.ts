@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { couponController } from '@/controllers/coupon.controller';
 
-const router = Router();
+const router: import("express").Router = Router();
 
 /**
  * @openapi

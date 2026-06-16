@@ -7,7 +7,7 @@ import swaggerUi from 'swagger-ui-express';
 import { router } from '@/routes';
 import { swaggerSpec } from '@/config/swagger';
 
-const app = express();
+const app: import("express").Express = express();
 
 app.use(cors());
 app.use(

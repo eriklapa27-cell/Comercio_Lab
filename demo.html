@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>X-DROPS — Alquimia Digital Desatada</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+    <style>
+        :root {
+            --bg-void: #050810;
+            --bg-deep: #0a0d1a;
+            --bg-panel: #0f1423;
+            --bg-card: #141928;
+            --bg-hover: #1a2035;
+            --cyan: #00f5ff;
+            --cyan-dim: #00c4cc;
+            --cyan-glow: rgba(0,245,255,0.15);
+            --magenta: #ff2d78;
+            --magenta-glow: rgba(255,45,120,0.15);
+            --purple: #7b2fff;
+            --gold: #f0c040;
+            --text-primary: #e8eaf0;
+            --text-secondary: #8892aa;
+            --text-muted: #4a5270;
+            --border: rgba(0,245,255,0.12);
+            --border-bright: rgba(0,245,255,0.35);
+            --legendary: #f0c040;
+            --epic: #a855f7;
+            --rare: #3b82f6;
+            --common: #6b7280;
+            --font-display: 'Exo 2', sans-serif;
+            --font-ui: 'Rajdhani', sans-serif;
+            --font-mono: 'Share Tech Mono', monospace;
+        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{background:var(--bg-void);color:var(--text-primary);font-family:var(--font-ui);min-height:100vh;overflow-x:hidden;}
+        body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(0,245,255,0.06) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 100% 60%,rgba(123,47,255,0.05) 0%,transparent 60%);pointer-events:none;z-index:0;}
+
+        /* GRID NOISE BG */
+        body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,245,255,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(0,245,255,0.015) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+
+        /* PAGES */
+        .page{display:none;min-height:100vh;position:relative;z-index:1;}
+        .page.active{display:block;}
+
+        /* NAV */
+        nav{display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:60px;background:rgba(5,8,16,0.9);border-bottom:1px solid var(--border);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;}
+        .logo{font-family:var(--font-display);font-size:22px;font-weight:900;color:var(--cyan);letter-spacing:3px;cursor:pointer;text-shadow:0 0 20px var(--cyan);}
+        .nav-links{display:flex;gap:28px;align-items:center;}
+        .nav-links a{color:var(--text-secondary);font-size:14px;font-weight:600;letter-spacing:1.5px;text-decoration:none;text-transform:uppercase;cursor:pointer;transition:color .2s;}
+        .nav-links a:hover,.nav-links a.active{color:var(--cyan);}
+        .nav-actions{display:flex;align-items:center;gap:16px;}
+        .nav-icon{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text-secondary);font-size:16px;transition:all .2s;background:var(--bg-panel);}
+        .nav-icon:hover{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 12px var(--cyan-glow);}
+        .cart-badge{position:relative;}
+        .cart-badge::after{content:'2';position:absolute;top:-6px;right:-6px;background:var(--magenta);color:#fff;font-size:10px;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);}
+
+        /* BUTTONS */
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 24px;border-radius:4px;font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border:none;transition:all .2s;text-decoration:none;}
+        .btn-primary{background:var(--cyan);color:var(--bg-void);box-shadow:0 0 20px rgba(0,245,255,0.4);}
+        .btn-primary:hover{background:#fff;box-shadow:0 0 30px rgba(0,245,255,0.7);}
+        .btn-outline{background:transparent;color:var(--cyan);border:1px solid var(--cyan);}
+        .btn-outline:hover{background:var(--cyan-glow);box-shadow:0 0 15px var(--cyan-glow);}
+        .btn-magenta{background:var(--magenta);color:#fff;box-shadow:0 0 20px var(--magenta-glow);}
+        .btn-ghost{background:rgba(255,255,255,0.06);color:var(--text-primary);border:1px solid var(--border);}
+        .btn-ghost:hover{border-color:var(--border-bright);}
+        .btn-lg{padding:14px 36px;font-size:14px;}
+        .btn-block{width:100%;}
+
+        /* BADGES */
+        .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:3px;font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;}
+        .badge-legendary{background:rgba(240,192,64,0.15);color:var(--legendary);border:1px solid rgba(240,192,64,0.4);}
+        .badge-epic{background:rgba(168,85,247,0.15);color:#a855f7;border:1px solid rgba(168,85,247,0.4);}
+        .badge-rare{background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.4);}
+        .badge-common{background:rgba(107,114,128,0.15);color:#9ca3af;border:1px solid rgba(107,114,128,0.3);}
+
+        /* CARDS */
+        .card{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;overflow:hidden;transition:all .25s;}
+        .card:hover{border-color:var(--border-bright);box-shadow:0 0 30px rgba(0,245,255,0.07);}
+
+        /* INPUTS */
+        .input-group{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+        .input-label{font-family:var(--font-mono);font-size:11px;color:var(--text-secondary);letter-spacing:1.5px;text-transform:uppercase;}
+        .input{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:4px;padding:12px 16px;color:var(--text-primary);font-family:var(--font-ui);font-size:14px;width:100%;transition:border .2s;outline:none;}
+        .input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,245,255,0.08);}
+        .input::placeholder{color:var(--text-muted);}
+
+        /* SECTION */
+        .section{padding:60px 40px;max-width:1200px;margin:0 auto;}
+        .section-title{font-family:var(--font-display);font-size:28px;font-weight:700;margin-bottom:8px;letter-spacing:1px;}
+        .section-sub{color:var(--text-secondary);font-size:14px;margin-bottom:32px;}
+
+        /* DIVIDER */
+        .divider{height:1px;background:linear-gradient(90deg,transparent,var(--border-bright),transparent);margin:40px 0;}
+
+        /* =====================
+           LOGIN PAGE
+           ===================== */
+        #page-login{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:40px;}
+        .login-box{background:var(--bg-panel);border:1px solid var(--border);border-radius:12px;padding:44px 40px;width:100%;max-width:440px;}
+        .login-box h1{font-family:var(--font-display);font-size:26px;font-weight:700;margin-bottom:4px;}
+        .login-box p{color:var(--text-secondary);font-size:13px;margin-bottom:28px;}
+        .oauth-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px;border-radius:4px;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:var(--text-primary);font-family:var(--font-ui);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.5px;margin-bottom:10px;}
+        .oauth-btn:hover{border-color:var(--border-bright);background:var(--bg-hover);}
+        .oauth-icon{width:18px;height:18px;border-radius:50%;}
+        .divider-or{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--text-muted);font-size:12px;font-family:var(--font-mono);}
+        .divider-or::before,.divider-or::after{content:'';flex:1;height:1px;background:var(--border);}
+        .forgot{font-size:12px;color:var(--cyan);cursor:pointer;text-decoration:none;}
+        .login-footer{margin-top:20px;text-align:center;font-size:13px;color:var(--text-secondary);}
+        .login-footer a{color:var(--cyan);cursor:pointer;font-weight:700;}
+
+        /* =====================
+           CATALOG PAGE
+           ===================== */
+        .hero-featured{position:relative;background:linear-gradient(135deg,#0a0d1a 0%,#0f0820 50%,#0a0d1a 100%);border-bottom:1px solid var(--border);overflow:hidden;padding:60px 40px;}
+        .hero-featured::after{content:'';position:absolute;right:0;top:0;width:50%;height:100%;background:linear-gradient(135deg,transparent,rgba(123,47,255,0.15));pointer-events:none;}
+        .hero-tag{font-family:var(--font-mono);font-size:11px;color:var(--cyan);border:1px solid var(--cyan);padding:4px 12px;border-radius:2px;display:inline-block;margin-bottom:16px;letter-spacing:2px;}
+        .hero-title{font-family:var(--font-display);font-size:52px;font-weight:900;line-height:1;margin-bottom:12px;text-shadow:0 0 40px rgba(0,245,255,0.3);}
+        .hero-desc{color:var(--text-secondary);max-width:480px;line-height:1.6;margin-bottom:28px;font-size:15px;}
+        .hero-btns{display:flex;gap:12px;}
+
+        .catalog-filters{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;max-width:1200px;margin:0 auto;}
+        .filter-tabs{display:flex;gap:4px;}
+        .filter-tab{padding:7px 18px;border-radius:3px;font-family:var(--font-mono);font-size:12px;letter-spacing:1px;cursor:pointer;border:1px solid transparent;transition:all .2s;color:var(--text-secondary);}
+        .filter-tab.active,.filter-tab:hover{color:var(--cyan);border-color:var(--cyan);background:var(--cyan-glow);}
+        .sort-select{background:var(--bg-panel);border:1px solid var(--border);color:var(--text-secondary);padding:7px 14px;border-radius:4px;font-family:var(--font-mono);font-size:11px;cursor:pointer;outline:none;}
+
+        .product-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding:0 40px 60px;max-width:1200px;margin:0 auto;}
+        .product-card{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;overflow:hidden;cursor:pointer;transition:all .25s;}
+        .product-card:hover{border-color:rgba(0,245,255,0.4);transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,0.4),0 0 30px rgba(0,245,255,0.08);}
+        .product-card.sold-out{opacity:.5;}
+        .product-img{width:100%;aspect-ratio:1;object-fit:cover;background:linear-gradient(135deg,#1a1030,#0a1a2a);display:flex;align-items:center;justify-content:center;position:relative;}
+        .product-img-placeholder{width:100%;aspect-ratio:1;background:linear-gradient(135deg,#1a1030 0%,#0d1825 50%,#1a0a20 100%);display:flex;align-items:center;justify-content:center;font-size:48px;position:relative;}
+        .product-img-placeholder::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(0,245,255,0.1),transparent 70%);}
+        .badge-float{position:absolute;top:10px;left:10px;}
+        .product-info{padding:16px;}
+        .product-name{font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:.5px;margin-bottom:4px;}
+        .product-desc{color:var(--text-secondary);font-size:12px;line-height:1.4;margin-bottom:12px;}
+        .product-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+        .product-price{font-family:var(--font-mono);font-size:16px;color:var(--cyan);font-weight:700;}
+        .product-prob{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);}
+
+        /* upsell card */
+        .upsell-card{background:linear-gradient(135deg,var(--bg-card),rgba(123,47,255,0.1));border:1px solid rgba(123,47,255,0.3);border-radius:8px;padding:24px;display:flex;flex-direction:column;gap:12px;}
+        .upsell-title{font-family:var(--font-display);font-size:18px;font-weight:700;text-align:center;text-transform:uppercase;letter-spacing:1px;}
+        .upsell-desc{color:var(--text-secondary);font-size:12px;text-align:center;line-height:1.5;}
+        .xp-bar-container{display:flex;flex-direction:column;gap:6px;}
+        .xp-bar-labels{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10px;color:var(--text-muted);}
+        .xp-bar{height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;}
+        .xp-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple));width:82%;}
+
+        .subscribe-banner{background:linear-gradient(90deg,var(--bg-card),rgba(123,47,255,0.08),var(--bg-card));border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:40px;display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:60px;}
+        .subscribe-text h2{font-family:var(--font-display);font-size:32px;font-weight:900;line-height:1.1;text-transform:uppercase;}
+        .subscribe-text h2 span{color:var(--cyan);}
+        .subscribe-text p{color:var(--text-secondary);font-size:13px;margin-top:8px;}
+        .subscribe-form{display:flex;gap:8px;min-width:360px;}
+        .subscribe-form input{flex:1;background:var(--bg-panel);border:1px solid var(--border);border-radius:4px;padding:12px 16px;color:var(--text-primary);font-family:var(--font-ui);font-size:13px;outline:none;}
+        .subscribe-form input:focus{border-color:var(--cyan);}
+
+        /* =====================
+           PRODUCT DETAIL
+           ===================== */
+        .detail-breadcrumb{padding:16px 40px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:1px;}
+        .detail-breadcrumb span{color:var(--cyan);}
+        .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;padding:0 40px 60px;max-width:1200px;margin:0 auto;}
+        .detail-title{font-family:var(--font-display);font-size:42px;font-weight:900;line-height:1;margin-bottom:20px;}
+        .detail-main-img{background:linear-gradient(135deg,#1a0a30,#081525,#200a1a);border-radius:8px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:80px;border:1px solid var(--border);position:relative;overflow:hidden;}
+        .detail-main-img::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 40% 40%,rgba(0,245,255,0.08),transparent 60%),radial-gradient(circle at 80% 80%,rgba(123,47,255,0.08),transparent 50%);}
+        .thumb-row{display:flex;gap:8px;margin-top:12px;}
+        .thumb{width:70px;height:70px;border-radius:4px;border:1px solid var(--border);background:var(--bg-card);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;transition:border .2s;}
+        .thumb.active,.thumb:hover{border-color:var(--cyan);}
+        .thumb-more{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);}
+
+        .detail-info-card{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:20px;}
+        .series-tag{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:2px;margin-bottom:8px;}
+        .stars{color:var(--gold);font-size:14px;margin-bottom:10px;}
+        .price-row{display:flex;align-items:flex-end;justify-content:space-between;margin:16px 0 8px;}
+        .price-val{font-family:var(--font-display);font-size:36px;font-weight:900;color:var(--cyan);}
+        .countdown{font-family:var(--font-mono);font-size:28px;color:var(--text-primary);}
+        .mint-progress{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-bottom:16px;}
+        .detail-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+        .guarantees{display:flex;flex-direction:column;gap:8px;}
+        .guarantee-item{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-secondary);}
+        .guarantee-item span{font-size:16px;}
+
+        .rewards-section{max-width:1200px;margin:0 auto;padding:0 40px 60px;}
+        .rewards-title{font-family:var(--font-display);font-size:22px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;}
+        .rewards-title a{font-size:13px;color:var(--cyan);text-decoration:none;font-family:var(--font-mono);}
+        .rewards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:40px;}
+        .reward-card{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+        .reward-img{aspect-ratio:1;background:linear-gradient(135deg,#1a0a30,#081525);display:flex;align-items:center;justify-content:center;font-size:36px;}
+        .reward-info{padding:10px;}
+        .reward-tier{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);display:flex;justify-content:space-between;margin-bottom:4px;}
+        .reward-name{font-size:13px;font-weight:600;}
+
+        .prob-tech-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:32px;}
+        .prob-table{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+        .prob-table-title{padding:14px 20px;font-family:var(--font-display);font-size:16px;font-weight:700;border-bottom:1px solid var(--border);}
+        .prob-row{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);}
+        .prob-row:last-child{border:none;}
+        .prob-dot{width:8px;height:8px;border-radius:50%;margin-right:10px;display:inline-block;}
+        .prob-label{display:flex;align-items:center;font-size:14px;}
+        .prob-val{font-family:var(--font-mono);font-size:13px;color:var(--cyan);}
+        .tech-card{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+        .tech-card-title{padding:14px 20px;font-family:var(--font-display);font-size:16px;font-weight:700;border-bottom:1px solid var(--border);}
+        .tech-row{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);}
+        .tech-row:last-child{border:none;}
+        .tech-key{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-secondary);}
+        .tech-val{font-family:var(--font-mono);font-size:11px;color:var(--text-primary);}
+
+        /* =====================
+           CART PAGE
+           ===================== */
+        .cart-layout{display:grid;grid-template-columns:1fr 380px;gap:32px;padding:40px;max-width:1200px;margin:0 auto;}
+        .cart-title{font-family:var(--font-display);font-size:40px;font-weight:900;margin-bottom:4px;}
+        .cart-sub{color:var(--text-secondary);font-size:13px;margin-bottom:32px;}
+        .cart-item{display:flex;align-items:center;gap:20px;padding:20px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:12px;}
+        .cart-item-img{width:80px;height:80px;border-radius:6px;background:linear-gradient(135deg,#1a0a30,#081525);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;border:1px solid var(--border);}
+        .cart-item-info{flex:1;}
+        .cart-item-name{font-family:var(--font-display);font-size:16px;font-weight:700;margin-bottom:3px;letter-spacing:.5px;}
+        .cart-item-series{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:1px;}
+        .cart-item-price{font-family:var(--font-mono);font-size:18px;color:var(--cyan);font-weight:700;}
+        .qty-ctrl{display:flex;align-items:center;gap:10px;margin-top:10px;}
+        .qty-btn{width:28px;height:28px;border-radius:3px;border:1px solid var(--border);background:var(--bg-hover);color:var(--text-primary);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+        .qty-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+        .qty-val{font-family:var(--font-mono);font-size:14px;min-width:24px;text-align:center;}
+        .delete-btn{background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;padding:8px;transition:color .2s;margin-left:auto;}
+        .delete-btn:hover{color:var(--magenta);}
+
+        .order-summary{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:24px;position:sticky;top:80px;}
+        .order-summary h3{font-family:var(--font-display);font-size:20px;font-weight:700;margin-bottom:20px;}
+        .summary-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:14px;}
+        .summary-row.total{border-top:1px solid var(--border);padding-top:16px;margin-top:16px;font-family:var(--font-display);font-size:18px;font-weight:700;}
+        .summary-row.total .val{font-family:var(--font-mono);font-size:28px;color:var(--cyan);}
+        .summary-key{color:var(--text-secondary);}
+        .summary-val{font-family:var(--font-mono);font-size:13px;}
+        .summary-val.discount{color:#4ade80;}
+        .promo-row{display:flex;gap:8px;margin:16px 0;}
+        .promo-row input{flex:1;}
+        .promo-row .btn{padding:10px 16px;font-size:11px;}
+        .secure-note{display:flex;align-items:center;justify-content:center;gap:6px;font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-top:12px;letter-spacing:1px;}
+
+        .upcoming-title{font-family:var(--font-display);font-size:20px;font-weight:700;margin-bottom:20px;}
+        .upcoming-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+        .upcoming-card{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+        .upcoming-img{aspect-ratio:1;background:linear-gradient(135deg,#1a0a30,#081525);display:flex;align-items:center;justify-content:center;font-size:32px;position:relative;}
+        .upcoming-img.locked{filter:grayscale(.8);opacity:.5;}
+        .locked-icon{position:absolute;font-size:20px;}
+        .upcoming-info{padding:10px;}
+        .upcoming-status{font-family:var(--font-mono);font-size:9px;color:var(--cyan);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px;}
+        .upcoming-name{font-size:11px;font-weight:700;letter-spacing:.5px;}
+
+        /* =====================
+           CHECKOUT PAGE
+           ===================== */
+        .checkout-layout{display:grid;grid-template-columns:1fr 380px;gap:32px;padding:40px;max-width:1200px;margin:0 auto;}
+        .checkout-title{font-family:var(--font-display);font-size:36px;font-weight:900;margin-bottom:4px;}
+        .checkout-sub{color:var(--text-secondary);font-size:13px;margin-bottom:32px;}
+        .step-indicator{display:flex;align-items:center;gap:0;margin-bottom:40px;}
+        .step{display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;}
+        .step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border:2px solid var(--border);color:var(--text-muted);}
+        .step.active .step-num{border-color:var(--cyan);color:var(--cyan);background:rgba(0,245,255,0.1);}
+        .step.done .step-num{border-color:var(--cyan);background:var(--cyan);color:var(--bg-void);}
+        .step-label{color:var(--text-muted);}
+        .step.active .step-label{color:var(--cyan);}
+        .step-line{flex:1;height:1px;background:var(--border);margin:0 12px;}
+
+        .form-section{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:24px;margin-bottom:16px;}
+        .form-section-title{display:flex;align-items:center;gap:8px;font-family:var(--font-display);font-size:16px;font-weight:700;margin-bottom:20px;}
+        .form-section-title span{font-size:18px;}
+        .form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+        .save-addr{display:flex;align-items:center;gap:8px;margin-top:4px;font-size:13px;color:var(--text-secondary);cursor:pointer;}
+        .save-addr input[type=checkbox]{accent-color:var(--cyan);width:15px;height:15px;}
+
+        .delivery-options{display:flex;flex-direction:column;gap:10px;}
+        .delivery-opt{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .2s;}
+        .delivery-opt.selected,.delivery-opt:hover{border-color:var(--cyan);background:var(--cyan-glow);}
+        .delivery-left{display:flex;align-items:center;gap:12px;}
+        .delivery-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);position:relative;}
+        .delivery-opt.selected .delivery-radio{border-color:var(--cyan);}
+        .delivery-opt.selected .delivery-radio::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--cyan);}
+        .delivery-name{font-weight:700;font-size:14px;}
+        .delivery-sub{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);}
+        .delivery-price{font-family:var(--font-mono);font-size:14px;color:#4ade80;font-weight:700;}
+        .delivery-badge-fast{background:rgba(255,45,120,0.15);color:var(--magenta);border:1px solid var(--magenta);font-family:var(--font-mono);font-size:9px;padding:2px 6px;border-radius:2px;letter-spacing:1px;}
+
+        .checkout-summary{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:24px;position:sticky;top:80px;}
+        .checkout-item{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+        .checkout-item-img{width:52px;height:52px;border-radius:4px;background:linear-gradient(135deg,#1a0a30,#081525);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+        .checkout-item-info .name{font-size:13px;font-weight:700;}
+        .checkout-item-info .tier{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);}
+        .checkout-item-info .price{font-family:var(--font-mono);font-size:14px;color:var(--cyan);}
+        .xp-progress{margin-top:16px;padding-top:16px;border-top:1px solid var(--border);}
+        .xp-label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-bottom:6px;}
+        .xp-label span{color:var(--cyan);}
+
+        /* =====================
+           PAYMENT PAGE
+           ===================== */
+        .payment-layout{display:grid;grid-template-columns:1fr 380px;gap:32px;padding:40px;max-width:1200px;margin:0 auto;}
+        .payment-methods{display:flex;gap:8px;margin-bottom:24px;}
+        .payment-method{flex:1;padding:12px;border:2px solid var(--border);border-radius:6px;cursor:pointer;text-align:center;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:600;}
+        .payment-method.active{border-color:var(--cyan);background:var(--cyan-glow);}
+        .payment-method span{font-size:18px;}
+        .card-icons{display:flex;gap:8px;justify-content:flex-end;margin-bottom:16px;}
+        .card-icon{background:var(--bg-hover);border:1px solid var(--border);border-radius:4px;padding:4px 10px;font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:1px;}
+        .security-badges{display:flex;gap:16px;margin-top:16px;}
+        .sec-badge{display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:.5px;}
+        .sec-badge span{font-size:14px;}
+
+        /* =====================
+           PROFILE PAGE
+           ===================== */
+        .profile-layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 60px);}
+        .profile-sidebar{background:var(--bg-panel);border-right:1px solid var(--border);padding:28px 20px;}
+        .profile-user{display:flex;align-items:center;gap:14px;margin-bottom:28px;}
+        .avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid var(--cyan);box-shadow:0 0 15px rgba(0,245,255,0.3);}
+        .profile-name{font-family:var(--font-display);font-size:15px;font-weight:700;}
+        .profile-level{font-family:var(--font-mono);font-size:10px;color:var(--cyan);letter-spacing:1px;}
+        .sidebar-menu{display:flex;flex-direction:column;gap:4px;}
+        .sidebar-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600;color:var(--text-secondary);transition:all .2s;letter-spacing:.5px;}
+        .sidebar-item:hover{background:var(--bg-hover);color:var(--text-primary);}
+        .sidebar-item.active{background:rgba(0,245,255,0.08);color:var(--cyan);border:1px solid rgba(0,245,255,0.15);}
+        .sidebar-item span{font-size:16px;}
+
+        .profile-main{padding:32px 40px;}
+        .profile-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;}
+        .profile-hero{display:flex;align-items:center;gap:18px;}
+        .avatar-lg{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:32px;border:3px solid var(--cyan);box-shadow:0 0 25px rgba(0,245,255,0.3);}
+        .profile-title{font-family:var(--font-display);font-size:28px;font-weight:700;}
+        .profile-rank{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:1px;}
+        .profile-rank span{color:var(--cyan);}
+        .profile-stats{display:flex;gap:24px;}
+        .stat-box{text-align:center;}
+        .stat-val{font-family:var(--font-mono);font-size:24px;font-weight:700;color:var(--text-primary);}
+        .stat-key{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;}
+
+        .shipments-title{font-family:var(--font-display);font-size:16px;font-weight:700;margin-bottom:16px;letter-spacing:.5px;}
+        .shipment-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px;}
+        .shipment-card{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:16px;}
+        .shipment-name{font-family:var(--font-display);font-size:14px;font-weight:700;margin-bottom:2px;}
+        .shipment-track{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:1px;margin-bottom:12px;}
+        .shipment-bar{height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;margin-bottom:8px;}
+        .shipment-fill{height:100%;border-radius:2px;}
+        .fill-transit{background:linear-gradient(90deg,var(--cyan),var(--purple));width:65%;}
+        .fill-processing{background:linear-gradient(90deg,var(--magenta),var(--purple));width:30%;}
+        .shipment-stages{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:.5px;}
+        .shipment-eta{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-top:8px;}
+        .shipment-badge{float:right;margin-bottom:8px;}
+
+        .vault-title{display:flex;align-items:center;justify-content:space-between;font-family:var(--font-display);font-size:16px;font-weight:700;margin-bottom:16px;}
+        .vault-title a{font-family:var(--font-mono);font-size:11px;color:var(--cyan);text-decoration:none;}
+        .vault-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+        .vault-item{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;transition:all .2s;}
+        .vault-item:hover{border-color:var(--border-bright);transform:translateY(-2px);}
+        .vault-img{aspect-ratio:1;background:linear-gradient(135deg,#1a0a30,#081525);display:flex;align-items:center;justify-content:center;font-size:32px;position:relative;}
+        .vault-info{padding:10px;}
+        .vault-name{font-size:12px;font-weight:700;margin-bottom:2px;}
+        .vault-date{font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:.5px;}
+        .vault-val{font-family:var(--font-mono);font-size:11px;color:var(--cyan);font-weight:700;}
+
+        /* FOOTER */
+        footer{background:var(--bg-panel);border-top:1px solid var(--border);padding:24px 40px;display:flex;align-items:center;justify-content:space-between;}
+        .footer-logo{font-family:var(--font-display);font-size:18px;font-weight:900;color:var(--cyan);letter-spacing:3px;}
+        .footer-links{display:flex;gap:24px;}
+        .footer-links a{color:var(--text-muted);font-size:13px;text-decoration:none;cursor:pointer;transition:color .2s;}
+        .footer-links a:hover{color:var(--text-primary);}
+        .footer-copy{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:.5px;text-align:right;}
+
+        /* TOAST */
+        .toast{position:fixed;bottom:24px;right:24px;background:var(--bg-card);border:1px solid var(--cyan);border-radius:6px;padding:14px 20px;font-family:var(--font-mono);font-size:12px;color:var(--cyan);z-index:999;opacity:0;transform:translateY(20px);transition:all .3s;pointer-events:none;letter-spacing:1px;}
+        .toast.show{opacity:1;transform:translateY(0);}
+
+        /* ANIMATIONS */
+        @keyframes pulse-cyan{0%,100%{box-shadow:0 0 20px rgba(0,245,255,0.3);}50%{box-shadow:0 0 40px rgba(0,245,255,0.6);}}
+        @keyframes blink{0%,100%{opacity:1;}50%{opacity:.4;}}
+        .pulse{animation:pulse-cyan 2s ease-in-out infinite;}
+        .countdown-blink span:nth-child(2){animation:blink 1s step-end infinite;}
+    </style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✓ OPERACIÓN COMPLETADA</div>
+
+<!-- ========================
+     PAGE: LOGIN
+     ======================== -->
+<div class="page active" id="page-login">
+    <div style="position:fixed;inset:0;background:radial-gradient(ellipse 60% 60% at 30% 50%,rgba(123,47,255,0.12),transparent),radial-gradient(ellipse 40% 40% at 80% 20%,rgba(0,245,255,0.08),transparent);pointer-events:none;z-index:0;"></div>
+    <div class="login-box" style="position:relative;z-index:1;">
+        <div class="logo" style="text-align:center;margin-bottom:24px;font-size:28px;">X-DROPS</div>
+        <h1>Acceso / Login</h1>
+        <p>Entra en la bóveda digital para reclamar tus drops exclusivos.</p>
+
+        <button class="oauth-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Continuar con Google
+        </button>
+        <button class="oauth-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--text-primary)"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+            Continuar con Apple
+        </button>
+
+        <div class="divider-or">O</div>
+
+        <div class="input-group">
+            <label class="input-label">Correo Electrónico</label>
+            <input class="input" type="email" placeholder="nombre@vault.com"/>
+        </div>
+        <div class="input-group">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <label class="input-label">Contraseña</label>
+                <a class="forgot">¿OLVIDASTE?</a>
+            </div>
+            <input class="input" type="password" placeholder="••••••••"/>
+        </div>
+
+        <button class="btn btn-primary btn-block btn-lg" style="margin-top:8px;" onclick="goTo('catalog')">
+            INICIALIZAR SESIÓN
+        </button>
+
+        <div class="login-footer">
+            ¿Nuevo operativo? <a onclick="showToast('REGISTRO DISPONIBLE PRÓXIMAMENTE')">Crear Cuenta</a>
+        </div>
+
+        <div style="border-top:1px solid var(--border);margin-top:20px;padding-top:16px;display:flex;justify-content:center;gap:20px;">
+            <a style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);cursor:pointer;letter-spacing:1px;">PRIVACIDAD</a>
+            <a style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);cursor:pointer;letter-spacing:1px;">TÉRMINOS</a>
+        </div>
+    </div>
+</div>
+
+<!-- ========================
+     PAGE: CATALOG
+     ======================== -->
+<div class="page" id="page-catalog">
+    <nav>
+        <div class="logo" onclick="goTo('catalog')">X-DROPS</div>
+        <div class="nav-links">
+            <a class="active">Drops</a>
+            <a>Tendencias</a>
+            <a onclick="goTo('catalog')">Mercado</a>
+            <a onclick="goTo('profile')">Bóveda</a>
+        </div>
+        <div class="nav-actions">
+            <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:4px;padding:6px 14px;font-size:13px;display:flex;align-items:center;gap:8px;">
+                <span style="color:var(--text-muted);font-family:var(--font-mono);font-size:11px;">🔍</span>
+                <input style="background:none;border:none;outline:none;color:var(--text-primary);font-size:12px;width:140px;font-family:var(--font-ui);" placeholder="Buscar en el catálogo..."/>
+            </div>
+            <div class="nav-icon cart-badge" onclick="goTo('cart')">🛒</div>
+            <div class="nav-icon" onclick="goTo('profile')">👤</div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero-featured">
+        <div class="hero-tag">◈ DROP DESTACADO: VANGUARDIA VIRTUAL</div>
+        <div class="hero-title">Protocolo Obsidian<br/>Pulse</div>
+        <div class="hero-desc">Desbloquea la primera oleada de activos de hardware descentralizados. Diseñados para el rendimiento, creados para la élite. Solo quedan 500 cajas.</div>
+        <div class="hero-btns">
+            <button class="btn btn-outline" onclick="goTo('detail')">REVELAR CONTENIDO</button>
+            <button class="btn btn-primary" onclick="goTo('cart')">AÑADIR A LA BOLSA</button>
+        </div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="catalog-filters">
+        <div>
+            <div class="section-title">Catálogo de Cajas</div>
+            <div class="filter-tabs" style="margin-top:10px;">
+                <div class="filter-tab active">Todas las Colecciones</div>
+                <div class="filter-tab">Electrónica</div>
+                <div class="filter-tab">Ropa</div>
+                <div class="filter-tab">Artefactos</div>
+            </div>
+        </div>
+        <select class="sort-select">
+            <option>Ordenar por: Rareza Alta - Baja</option>
+            <option>Precio: Alto - Bajo</option>
+            <option>Precio: Bajo - Alto</option>
+            <option>Más Reciente</option>
+        </select>
+    </div>
+
+    <!-- GRID -->
+    <div class="product-grid">
+        <!-- Card 1 -->
+        <div class="product-card" onclick="goTo('detail')">
+            <div class="product-img-placeholder">
+                🎁
+                <div class="badge-float"><span class="badge badge-legendary">◈ LEGENDARIO</span></div>
+                <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(240,192,64,0.15),transparent 70%);"></div>
+            </div>
+            <div class="product-info">
+                <div class="product-name">CAJA NEÓN APEX</div>
+                <div class="product-desc">Periféricos mecánicos de alta rendimiento y equipo háptico de edición limitada.</div>
+                <div class="product-meta">
+                    <div class="product-price">S/ 960.00</div>
+                    <div class="product-prob">90% PROBABILIDAD DE RARA+</div>
+                </div>
+                <button class="btn btn-outline btn-block">STAKE PARA DESBLOQUEAR</button>
+            </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="product-card" onclick="goTo('detail')">
+            <div class="product-img-placeholder">
+                📦
+                <div class="badge-float"><span class="badge badge-epic">ÉPICA</span></div>
+                <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(168,85,247,0.15),transparent 70%);"></div>
+            </div>
+            <div class="product-info">
+                <div class="product-name">CAJA DE SEGURIDAD</div>
+                <div class="product-desc">Hardware de sitio de última generación, unidades de almacenamiento modular y herramientas dev encriptadas.</div>
+                <div class="product-meta">
+                    <div class="product-price">S/ 715.00</div>
+                    <div class="product-prob">75% PROBABILIDAD DE RARA+</div>
+                </div>
+                <button class="btn btn-primary btn-block" onclick="event.stopPropagation();goTo('cart')">COMPRAR DROP</button>
+            </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="product-card" onclick="goTo('detail')">
+            <div class="product-img-placeholder">
+                ✨
+                <div class="badge-float"><span class="badge badge-epic">ÉPICA</span></div>
+                <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(0,245,255,0.12),transparent 70%);"></div>
+            </div>
+            <div class="product-info">
+                <div class="product-name">SÍNTESIS AURA</div>
+                <div class="product-desc">Tecnología de cuidado de la piel cyber-chic, pigmentos bioluminiscentes y wearables digitales.</div>
+                <div class="product-meta">
+                    <div class="product-price">S/ 465.00</div>
+                    <div class="product-prob">88% PROBABILIDAD DE RARA+</div>
+                </div>
+                <button class="btn btn-primary btn-block" onclick="event.stopPropagation();goTo('cart')">COMPRAR DROP</button>
+            </div>
+        </div>
+
+        <!-- Card 4 AGOTADO -->
+        <div class="product-card sold-out">
+            <div class="product-img-placeholder">
+                👻
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(5,8,16,0.6);font-family:var(--font-mono);font-size:14px;letter-spacing:2px;color:var(--text-muted);">AGOTADO</div>
+            </div>
+            <div class="product-info">
+                <div class="product-name">VOID WALKER</div>
+                <div class="product-desc">Equipo de tecnología digitales y accesorios urbanos fantasma.</div>
+                <div class="product-meta">
+                    <div class="product-price">S/ 380.00</div>
+                </div>
+                <button class="btn btn-ghost btn-block" disabled style="opacity:.4;cursor:not-allowed;">AGOTADO</button>
+            </div>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="product-card" onclick="goTo('detail')">
+            <div class="product-img-placeholder">
+                🔧
+                <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(240,192,64,0.08),transparent 70%);"></div>
+            </div>
+            <div class="product-info">
+                <div class="product-name">RAW CORE</div>
+                <div class="product-desc">Componentes esenciales y herramientas de utilidad digital de nivel de entrada.</div>
+                <div class="product-meta">
+                    <div class="product-price">S/ 175.00</div>
+                    <div class="product-prob">MÁS DE BASE</div>
+                </div>
+                <button class="btn btn-primary btn-block" onclick="event.stopPropagation();goTo('cart')">COMPRAR DROP</button>
+            </div>
+        </div>
+
+        <!-- Upsell card -->
+        <div class="upsell-card">
+            <div style="font-size:32px;text-align:center;">🔐</div>
+            <div class="upsell-title">SUBE DE NIVEL TUS<br/>DROPS</div>
+            <div class="upsell-desc">Únete al programa de la Bóveda para aumentar tu tasa de obtención de objetos raros en un 35%.</div>
+            <div class="xp-bar-container">
+                <div class="xp-bar-labels"><span>PROGRESO DE XP</span><span>4,080 / 5,000</span></div>
+                <div class="xp-bar"><div class="xp-fill"></div></div>
+            </div>
+            <button class="btn btn-primary btn-block" onclick="goTo('profile')">ENTRAR EN LA BÓVEDA</button>
+        </div>
+    </div>
+
+    <!-- SUBSCRIBE -->
+    <div class="subscribe-banner">
+        <div class="subscribe-text">
+            <h2>NUNCA TE PIERDAS UN<br/><span>REVEAL.</span></h2>
+            <p>Asegura tu lugar en la lista blanca para el próximo drop de la serie GENESIS. Solo quedan 100 espacios.</p>
+        </div>
+        <div class="subscribe-form">
+            <input placeholder="Introduce tu correo encriptado..."/>
+            <button class="btn btn-primary">SUSCRIBIRSE</button>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-logo">X-DROPS</div>
+        <div class="footer-links">
+            <a>Comunidad</a><a>Soporte</a><a>Legal</a><a>Privacidad</a>
+        </div>
+        <div class="footer-copy">© 2024 X-DROPS. ALQUIMIA DIGITAL DESATADA.<br/>TODOS LOS DERECHOS RESERVADOS.</div>
+    </footer>
+</div>
+
+<!-- ========================
+     PAGE: DETAIL
+     ======================== -->
+<div class="page" id="page-detail">
+    <nav>
+        <div class="logo" onclick="goTo('catalog')">X-DROPS</div>
+        <div class="nav-links">
+            <a onclick="goTo('catalog')">Drops</a><a>Tendencias</a><a onclick="goTo('catalog')">Mercado</a><a onclick="goTo('profile')">Bóveda</a>
+        </div>
+        <div class="nav-actions">
+            <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:4px;padding:6px 14px;font-size:13px;display:flex;align-items:center;gap:8px;">
+                <input style="background:none;border:none;outline:none;color:var(--text-primary);font-size:12px;width:140px;font-family:var(--font-ui);" placeholder="Buscar archivos..."/>
+            </div>
+            <div class="nav-icon cart-badge" onclick="goTo('cart')">🛒</div>
+            <div class="nav-icon" onclick="goTo('profile')">👤</div>
+        </div>
+    </nav>
+
+    <div class="detail-breadcrumb">
+        MERCADO &gt; RAREZA LEGENDARIA &gt; <span>DETALLE DE CAJA</span>
+    </div>
+
+    <div style="max-width:1200px;margin:0 auto;padding:0 40px 20px;">
+        <div class="detail-title">La Bóveda del Alquimista</div>
+    </div>
+
+    <div class="detail-grid">
+        <!-- LEFT: images -->
+        <div>
+            <div class="detail-main-img">🎁
+                <div class="badge-float" style="bottom:12px;right:12px;top:auto;left:auto;"><span class="badge badge-legendary">OBJETO LEGENDARIO</span></div>
+            </div>
+            <div class="thumb-row">
+                <div class="thumb active">🎁</div>
+                <div class="thumb">🔮</div>
+                <div class="thumb">⚡</div>
+                <div class="thumb" style="display:flex;flex-direction:column;">
+                    <div class="thumb-more">+12</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: info -->
+        <div>
+            <div class="detail-info-card">
+                <div class="series-tag">SERIE 04: PROTOCOLOS ARCANOS</div>
+                <div class="stars">★★★★☆</div>
+                <div style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin-bottom:16px;">Libera las secuencias ocultas de la forja digital. La Bóveda del Alquimista contiene raros artefactos generativos y paquetes de datos visuales multi-cadena encriptados dentro de un chasis forjado en vidrio.</div>
+                <div class="price-row">
+                    <div>
+                        <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:2px;margin-bottom:4px;">VALORACIÓN ACTUAL</div>
+                        <div class="price-val">S/ 25,000.00</div>
+                    </div>
+                    <div>
+                        <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:2px;margin-bottom:4px;">VALORACIÓN ACTUAL</div>
+                        <div class="countdown countdown-blink" id="countdown">04:12:55</div>
+                    </div>
+                </div>
+                <div class="mint-progress">762 / 1000 MINTEADOS &nbsp;&nbsp; 60% ASEGURADO</div>
+                <div class="detail-btns">
+                    <button class="btn btn-primary" onclick="goTo('checkout')">⚡ MINTEAR AHORA</button>
+                    <button class="btn btn-outline">🔖 HACER OFERTA</button>
+                </div>
+                <div class="guarantees">
+                    <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">GARANTÍAS DE LA BÓVEDA</div>
+                    <div class="guarantee-item"><span>🔵</span>Prueba de Autenticidad en Capa 2</div>
+                    <div class="guarantee-item"><span>🟢</span>Acceso de utilidad al Discord de "La Forja"</div>
+                    <div class="guarantee-item"><span>✨</span>15% de probabilidad de Variación Animada</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REWARDS -->
+    <div class="rewards-section">
+        <div class="rewards-title">
+            Recompensas Potenciales
+            <a>VER SERIE COMPLETA ↗</a>
+        </div>
+        <div class="rewards-grid">
+            <div class="reward-card">
+                <div class="reward-img" style="font-size:32px;">🌀</div>
+                <div class="reward-info">
+                    <div class="reward-tier"><span class="badge badge-epic" style="font-size:9px;">ÉPICO</span><span style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);">0.5% DROP</span></div>
+                    <div class="reward-name">Catalizador Neón</div>
+                </div>
+            </div>
+            <div class="reward-card">
+                <div class="reward-img" style="font-size:32px;">🔩</div>
+                <div class="reward-info">
+                    <div class="reward-tier"><span class="badge badge-rare" style="font-size:9px;">RARO</span><span style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);">12% DROP</span></div>
+                    <div class="reward-name">Módulo Lógico</div>
+                </div>
+            </div>
+            <div class="reward-card">
+                <div class="reward-img" style="font-size:32px;">⚡</div>
+                <div class="reward-info">
+                    <div class="reward-tier"><span class="badge badge-legendary" style="font-size:9px;">LEGENDARIO</span><span style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);">0.1% DROP</span></div>
+                    <div class="reward-name">El Núcleo</div>
+                </div>
+            </div>
+            <div class="reward-card">
+                <div class="reward-img" style="font-size:32px;">🌊</div>
+                <div class="reward-info">
+                    <div class="reward-tier"><span class="badge badge-common" style="font-size:9px;">COMÚN</span><span style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);">86.9% DROP</span></div>
+                    <div class="reward-name">Polvo de Éter</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="prob-tech-grid">
+            <div class="prob-table">
+                <div class="prob-table-title">Probabilidades de Drop</div>
+                <div class="prob-row"><div class="prob-label"><span class="prob-dot" style="background:var(--legendary);"></span>Legendario</div><div class="prob-val">0.12%</div></div>
+                <div class="prob-row"><div class="prob-label"><span class="prob-dot" style="background:var(--epic);"></span>Épico</div><div class="prob-val">4.88%</div></div>
+                <div class="prob-row"><div class="prob-label"><span class="prob-dot" style="background:var(--rare);"></span>Raro</div><div class="prob-val">15.00%</div></div>
+                <div class="prob-row"><div class="prob-label"><span class="prob-dot" style="background:var(--common);"></span>Poco Común / Común</div><div class="prob-val">80.00%</div></div>
+            </div>
+            <div class="tech-card">
+                <div class="tech-card-title">Especificaciones Técnicas</div>
+                <div class="tech-row"><div class="tech-key"><span>⚙️</span>Contrato Inteligente</div><div class="tech-val">0x8a1c...F92b</div></div>
+                <div class="tech-row"><div class="tech-key"><span>🔗</span>Red</div><div class="tech-val">Ethereum Layer 2 (Base)</div></div>
+                <div class="tech-row"><div class="tech-key"><span>📄</span>Metadatos</div><div class="tech-val">IPFS Frozen (Inmutable)</div></div>
+                <div class="tech-row"><div class="tech-key"><span>©️</span>Licencia</div><div class="tech-val">CC BY-NC 4.0</div></div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-logo">X-DROPS</div>
+        <div class="footer-links"><a>Comunidad</a><a>Soporte</a><a>Legal</a><a>Privacidad</a></div>
+        <div class="footer-copy">© 2024 X-DROPS. ALQUIMIA DIGITAL DESATADA. TODOS LOS DERECHOS RESERVADOS.</div>
+    </footer>
+</div>
+
+<!-- ========================
+     PAGE: CART
+     ======================== -->
+<div class="page" id="page-cart">
+    <nav>
+        <div class="logo" onclick="goTo('catalog')">X-DROPS</div>
+        <div class="nav-links">
+            <a onclick="goTo('catalog')">Drops</a><a>Tendencias</a><a onclick="goTo('catalog')">Mercado</a><a onclick="goTo('profile')">Bóveda</a>
+        </div>
+        <div class="nav-actions">
+            <div class="nav-icon cart-badge" onclick="goTo('cart')">🛒</div>
+            <div class="nav-icon" onclick="goTo('profile')">👤</div>
+        </div>
+    </nav>
+
+    <div class="cart-layout">
+        <div>
+            <div class="cart-title">Tu Bóveda</div>
+            <div class="cart-sub">Revisa tus drops asegurados antes de la extracción final.</div>
+
+            <!-- Item 1 -->
+            <div class="cart-item">
+                <div class="cart-item-img">🎁</div>
+                <div class="cart-item-info" style="flex:1;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
+                        <span class="badge badge-legendary">LEGENDARIO</span>
+                    </div>
+                    <div class="cart-item-name">PROTO-NÚCLEO ALPHA</div>
+                    <div class="cart-item-series">Serie 01 // Extracción Limitada</div>
+                    <div class="qty-ctrl">
+                        <button class="qty-btn" onclick="updateQty(this,-1)">−</button>
+                        <span class="qty-val">01</span>
+                        <button class="qty-btn" onclick="updateQty(this,1)">+</button>
+                    </div>
+                </div>
+                <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+                    <button class="delete-btn" onclick="removeItem(this)">🗑</button>
+                    <div class="cart-item-price">S/ 9,800.00</div>
+                </div>
+            </div>
+
+            <!-- Item 2 -->
+            <div class="cart-item">
+                <div class="cart-item-img">💎</div>
+                <div class="cart-item-info" style="flex:1;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
+                        <span class="badge badge-rare">RARO</span>
+                    </div>
+                    <div class="cart-item-name">FRAGMENTO NEÓN #88</div>
+                    <div class="cart-item-series">Nodo de Extracción // Protocolo Estándar</div>
+                    <div class="qty-ctrl">
+                        <button class="qty-btn" onclick="updateQty(this,-1)">−</button>
+                        <span class="qty-val">02</span>
+                        <button class="qty-btn" onclick="updateQty(this,1)">+</button>
+                    </div>
+                </div>
+                <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+                    <button class="delete-btn" onclick="removeItem(this)">🗑</button>
+                    <div class="cart-item-price">S/ 3,400.00</div>
+                </div>
+            </div>
+
+            <!-- UPCOMING -->
+            <div style="margin-top:40px;">
+                <div class="upcoming-title">No te pierdas estos próximos drops</div>
+                <div class="upcoming-grid">
+                    <div class="upcoming-card">
+                        <div class="upcoming-img">🌑</div>
+                        <div class="upcoming-info">
+                            <div class="upcoming-status">PRÓXIMAMENTE</div>
+                            <div class="upcoming-name">RELIQUIA DEL VACÍO #09</div>
+                        </div>
+                    </div>
+                    <div class="upcoming-card">
+                        <div class="upcoming-img">💫</div>
+                        <div class="upcoming-info">
+                            <div class="upcoming-status">PRÓXIMAMENTE</div>
+                            <div class="upcoming-name">CIBER-PÉTALO VII</div>
+                        </div>
+                    </div>
+                    <div class="upcoming-card">
+                        <div class="upcoming-img locked">🔒<span class="locked-icon">🔒</span></div>
+                        <div class="upcoming-info">
+                            <div class="upcoming-status" style="color:var(--text-muted);">CLASIFICADO</div>
+                            <div class="upcoming-name" style="color:var(--text-muted);">ACTIVO NO REVELADO</div>
+                        </div>
+                    </div>
+                    <div class="upcoming-card">
+                        <div class="upcoming-img locked">🔒<span class="locked-icon">🔒</span></div>
+                        <div class="upcoming-info">
+                            <div class="upcoming-status" style="color:var(--text-muted);">CLASIFICADO</div>
+                            <div class="upcoming-name" style="color:var(--text-muted);">ACTIVO NO REVELADO</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ORDER SUMMARY -->
+        <div>
+            <div class="order-summary">
+                <h3>Resumen del Pedido</h3>
+                <div class="summary-row"><span class="summary-key">Subtotal</span><span class="summary-val">S/ 16,600.00</span></div>
+                <div class="summary-row"><span class="summary-key">Tarifa de Red (Gas)</span><span class="summary-val">S/ 80.00</span></div>
+                <div class="summary-row"><span class="summary-key">Tarifa de Plataforma</span><span class="summary-val discount">−S/ 200.00</span></div>
+                <div class="summary-row total">
+                    <div>
+                        <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:1px;margin-bottom:4px;">COSTO TOTAL DE EXTRACCIÓN</div>
+                        <div>S/</div>
+                    </div>
+                    <span class="val">16,480.00</span>
+                </div>
+
+                <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:1px;margin-bottom:8px;">CÓDIGO PROMO</div>
+                <div class="promo-row">
+                    <input class="input" placeholder="INGRESAR CÓDIGO" style="font-family:var(--font-mono);font-size:12px;"/>
+                    <div style="display:flex;flex-direction:column;align-items:flex-end;">
+                        <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-bottom:4px;">S/ 80.00</div>
+                        <button class="btn btn-outline" style="padding:8px 14px;font-size:11px;">APPLY</button>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-block btn-lg" onclick="goTo('checkout')" style="margin-top:8px;letter-spacing:3px;">PROCEDER AL CHECKOUT</button>
+                <div class="secure-note">🔒 TRANSACCIÓN ENCRIPTADA SEGURA</div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-logo">X-DROPS</div>
+        <div class="footer-links"><a>Comunidad</a><a>Soporte</a><a>Legal</a><a>Privacidad</a></div>
+        <div class="footer-copy">© 2024 X-DROPS. ALQUIMIA DIGITAL DESATADA. TODOS LOS DERECHOS RESERVADOS.</div>
+    </footer>
+</div>
+
+<!-- ========================
+     PAGE: CHECKOUT
+     ======================== -->
+<div class="page" id="page-checkout">
+    <nav>
+        <div class="logo" onclick="goTo('catalog')">X-DROPS</div>
+        <div class="nav-links">
+            <a onclick="goTo('catalog')">Drops</a><a>Tendencias</a><a onclick="goTo('catalog')">Mercado</a><a onclick="goTo('profile')">Bóveda</a>
+        </div>
+        <div class="nav-actions">
+            <div class="nav-icon cart-badge" onclick="goTo('cart')">🛒</div>
+            <div class="nav-icon" onclick="goTo('profile')">👤</div>
+        </div>
+    </nav>
+
+    <div class="checkout-layout">
+        <div>
+            <div class="checkout-title">Envío y Checkout</div>
+            <div class="checkout-sub">Completa tu protocolo para asegurar el drop.</div>
+
+            <!-- STEPS -->
+            <div class="step-indicator">
+                <div class="step active">
+                    <div class="step-num">1</div>
+                    <div class="step-label">Envío</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div class="step-label">Pago</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div class="step-label">Revisión</div>
+                </div>
+            </div>
+
+            <!-- SHIPPING FORM -->
+            <div class="form-section">
+                <div class="form-section-title"><span>📍</span>Dirección de Envío</div>
+                <div class="form-grid-2">
+                    <div class="input-group"><label class="input-label">Nombre</label><input class="input" value="NEO"/></div>
+                    <div class="input-group"><label class="input-label">Apellido</label><input class="input" value="ANDERSON"/></div>
+                </div>
+                <div class="input-group"><label class="input-label">Dirección</label><input class="input" value="101 Binary Boulevard"/></div>
+                <div class="form-grid-2">
+                    <div class="input-group"><label class="input-label">Ciudad</label><input class="input" value="Zion"/></div>
+                    <div class="input-group"><label class="input-label">Código Postal</label><input class="input" value="000101"/></div>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">País / Región</label>
+                    <select class="input" style="cursor:pointer;">
+                        <option>Red Unida de Ciudades</option>
+                        <option>Perú</option>
+                        <option>Colombia</option>
+                    </select>
+                </div>
+                <label class="save-addr"><input type="checkbox" checked/> Guardar esta dirección para futuras transmisiones</label>
+            </div>
+
+            <!-- DELIVERY -->
+            <div class="form-section">
+                <div class="form-section-title"><span>📦</span>Protocolo de Entrega</div>
+                <div class="delivery-options">
+                    <div class="delivery-opt selected" onclick="selectDelivery(this)">
+                        <div class="delivery-left">
+                            <div class="delivery-radio"></div>
+                            <div>
+                                <div class="delivery-name">Encriptación Estándar</div>
+                                <div class="delivery-sub">5-7 Ciclos de Negocio</div>
+                            </div>
+                        </div>
+                        <div class="delivery-price">GRATIS</div>
+                    </div>
+                    <div class="delivery-opt" onclick="selectDelivery(this)">
+                        <div class="delivery-left">
+                            <div class="delivery-radio"></div>
+                            <div>
+                                <div class="delivery-name" style="display:flex;align-items:center;gap:8px;">Expreso Cuántico <span class="delivery-badge-fast">MÁS RÁPIDO</span></div>
+                                <div class="delivery-sub">Siguiente Ciclo de Arribo</div>
+                            </div>
+                        </div>
+                        <div class="delivery-price">S/ 25.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUMMARY -->
+        <div>
+            <div class="checkout-summary">
+                <div style="font-family:var(--font-display);font-size:18px;font-weight:700;margin-bottom:20px;">Resumen del Pedido</div>
+                <div class="checkout-item">
+                    <div class="checkout-item-img">🌑</div>
+                    <div class="checkout-item-info">
+                        <div class="badge badge-legendary" style="margin-bottom:4px;">DROP LEGENDARIO</div>
+                        <div class="name">Fragmento del Vacío #042</div>
+                        <div class="tier">Tier: Artefacto Legendario &nbsp; CANT: 1</div>
+                        <div class="price">S/ 1,250.00</div>
+                    </div>
+                </div>
+                <div class="checkout-item">
+                    <div class="checkout-item-img">⚡</div>
+                    <div class="checkout-item-info">
+                        <div class="badge badge-rare" style="margin-bottom:4px;">DROP RARO</div>
+                        <div class="name">Estabilizador de Núcleo Neón</div>
+                        <div class="tier">Tier: Componente Raro &nbsp; CANT: 1</div>
+                        <div class="price">S/ 420.00</div>
+                    </div>
+                </div>
+                <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:4px;">
+                    <div class="summary-row"><span class="summary-key">Subtotal</span><span class="summary-val">S/ 1,670.00</span></div>
+                    <div class="summary-row"><span class="summary-key">Impuesto de Red</span><span class="summary-val">S/ 83.50</span></div>
+                    <div class="summary-row"><span class="summary-key">Envío</span><span class="summary-val" style="color:#4ade80;">GRATIS</span></div>
+                    <div class="summary-row total" style="font-size:20px;">
+                        <span>Total</span><span class="val" style="font-size:26px;">S/ 1,753.50</span>
+                    </div>
+                    <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);text-align:right;margin-bottom:16px;">0.048 ETH</div>
+                </div>
+
+                <div class="promo-row" style="margin-bottom:12px;">
+                    <input class="input" placeholder="CÓDIGO_PROMOCIONAL" style="font-size:11px;font-family:var(--font-mono);"/>
+                    <button class="btn btn-ghost" style="padding:10px 14px;font-size:11px;flex-shrink:0;">Aplicar</button>
+                </div>
+
+                <button class="btn btn-primary btn-block btn-lg" onclick="goTo('payment')" style="letter-spacing:2px;">PROCEDER AL PAGO →</button>
+                <div class="secure-note" style="margin-top:10px;">🔐 TRANSMISIÓN ENCRIPTADA ASEGURADA POR X-SHIELD</div>
+
+                <div class="xp-progress">
+                    <div class="xp-label"><span>PROGRESO DE DESBLOQUEO DE XP</span><span>+150 XP</span></div>
+                    <div class="xp-bar"><div class="xp-fill" style="width:70%;"></div></div>
+                    <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);margin-top:6px;">Completa esta compra para alcanzar el Nivel 14: "El Alquimista"</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-logo">X-DROPS</div>
+        <div class="footer-links"><a>Comunidad</a><a>Soporte</a><a>Legal</a><a>Privacidad</a></div>
+        <div class="footer-copy">© 2024 X-DROPS. ALQUIMIA DIGITAL DESATADA. TODOS LOS DERECHOS RESERVADOS.</div>
+    </footer>
+</div>
+
+<!-- ========================
+     PAGE: PAYMENT
+     ======================== -->
+<div class="page" id="page-payment">
+    <nav>
+        <div class="logo" onclick="goTo('catalog')">X-DROPS</div>
+        <div class="nav-links">
+            <a onclick="goTo('catalog')">Drops</a><a>Tendencias</a><a onclick="goTo('catalog')">Mercado</a>
+        </div>
+        <div class="nav-actions">
+            <div style="display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:1px;">🔒 PAGO SEGURO</div>
+        </div>
+    </nav>
+
+    <div class="payment-layout">
+        <div>
+            <div class="checkout-title">Pago y Confirmación</div>
+            <div class="checkout-sub">Completa tu transacción para desbloquear la bóveda digital.</div>
+
+            <div class="form-section">
+                <div class="form-section-title">Método de Pago</div>
+                <div class="payment-methods">
+                    <div class="payment-method active"><span>💳</span>Tarjeta de Crédito / Débito</div>
+                    <div class="payment-method" onclick="togglePayMethod(this)"><span>🅿️</span>PayPal</div>
+                </div>
+
+                <div class="card-icons">
+                    <div class="card-icon">VISA</div>
+                    <div class="card-icon">MC</div>
+                    <div class="card-icon">AMEX</div>
+                    <div class="card-icon">DINERS</div>
+                </div>
+
+                <div class="input-group"><label class="input-label">Nombre del Titular</label><input class="input" value="ALEX MERCER"/></div>
+                <div class="input-group">
+                    <label class="input-label">Número de Tarjeta</label>
+                    <div style="position:relative;">
+                        <input class="input" placeholder="0000 0000 0000 0000" style="padding-right:48px;font-family:var(--font-mono);letter-spacing:2px;"/>
+                        <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:20px;">💳</span>
+                    </div>
+                </div>
+                <div class="form-grid-2">
+                    <div class="input-group"><label class="input-label">Fecha de Expiración</label><input class="input" placeholder="MM / AA"/></div>
+                    <div class="input-group">
+                        <label class="input-label" style="display:flex;align-items:center;gap:6px;">CVV / CVC <span style="font-size:12px;color:var(--text-muted);cursor:help;">ⓘ</span></label>
+                        <input class="input" placeholder="•••" style="font-family:var(--font-mono);letter-spacing:4px;"/>
+                    </div>
+                </div>
+
+                <div class="security-badges">
+                    <div class="sec-badge"><span>🛡️</span>CUMPLIMIENTO PCI-DSS</div>
+                    <div class="sec-badge"><span>🔒</span>ENCRIPTACIÓN AES DE 256 BITS</div>
+                    <div class="sec-badge"><span>🚫</span>PROTECCIÓN CONTRA FRAUDE ACTIVA</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAYMENT SUMMARY -->
+        <div>
+            <div class="checkout-summary">
+                <div class="checkout-item">
+                    <div class="checkout-item-img">🎁</div>
+                    <div class="checkout-item-info">
+                        <div class="badge badge-legendary" style="margin-bottom:4px;">DROP LEGENDARIO</div>
+                        <div class="name">PAQUETE VOID-RUNNER</div>
+                        <div class="price" style="font-size:16px;margin-top:4px;">S/. 9,250.00</div>
+                    </div>
+                </div>
+                <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:8px;">
+                    <div class="summary-row"><span class="summary-key">Subtotal</span><span class="summary-val">S/. 9,250.00</span></div>
+                    <div class="summary-row"><span class="summary-key">Tarifa de Gas de Red</span><span class="summary-val">S/. 7.50</span></div>
+                    <div class="summary-row"><span class="summary-key">Tarifa de Plataforma</span><span class="summary-val discount">S/. 0.00</span></div>
+                    <div class="summary-row total" style="font-size:18px;">
+                        <span>Total</span><span class="val" style="font-size:24px;">S/. 9,257.50</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-block btn-lg" onclick="completeOrder()" style="margin-top:16px;letter-spacing:2px;font-size:13px;">CONFIRMAR Y<br/>COMPLETAR DROP</button>
+                <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);text-align:center;margin-top:10px;letter-spacing:.5px;">AL HACER CLIC, ACEPTAS LOS TÉRMINOS DE SERVICIO DE X-DROPS.</div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-logo">X-DROPS</div>
+        <div class="footer-links"><a>Comunidad</a><a>Soporte</a><a>Legal</a><a>Privacidad</a></div>
+        <div class="footer-copy">© 2024 X-DROPS. ALQUIMIA DIGITAL DESATADA. TODOS LOS DERECHOS RESERVADOS.</div>
+    </footer>
+</div>
+
+<!-- ========================
+     PAGE: PROFILE
+     ======================== -->
+<div class="page" id="page-profile">
+    <nav>
+        <div class="logo" onclick="goTo('catalog')">X-DROPS</div>
+        <div class="nav-links">
+            <a onclick="goTo('catalog')">Drops</a><a>Tendencias</a><a onclick="goTo('catalog')">Mercado</a><a class="active" onclick="goTo('profile')">Bóveda</a>
+        </div>
+        <div class="nav-actions">
+            <div class="nav-icon cart-badge" onclick="goTo('cart')">🛒</div>
+            <div class="nav-icon" onclick="goTo('profile')">👤</div>
+        </div>
+    </nav>
+
+    <div class="profile-layout">
+        <!-- SIDEBAR -->
+        <div class="profile-sidebar">
+            <div class="profile-user">
+                <div class="avatar">🧑</div>
+                <div>
+                    <div class="profile-name">NEO ANDERSON</div>
+                    <div class="profile-level">OPERATIVO DE ÉLITE</div>
+                </div>
+            </div>
+            <div class="sidebar-menu">
+                <div class="sidebar-item active"><span>⬛</span>Ajustes de Usuario</div>
+                <div class="sidebar-item"><span>📊</span>Panel de Control</div>
+                <div class="sidebar-item"><span>🔐</span>Seguridad</div>
+                <div class="sidebar-item"><span>📜</span>Historial</div>
+                <div class="sidebar-item"><span>⚙️</span>Configuración</div>
+            </div>
+        </div>
+
+        <!-- MAIN -->
+        <div class="profile-main">
+            <div class="profile-header">
+                <div class="profile-hero">
+                    <div class="avatar-lg">🧑</div>
+                    <div>
+                        <div class="profile-title">Mi Perfil</div>
+                        <div class="profile-rank">Nivel Nexus: <span>Operativo de Élite</span></div>
+                    </div>
+                </div>
+                <div class="profile-stats">
+                    <div class="stat-box">
+                        <div class="stat-val">14,250</div>
+                        <div class="stat-key">XP ACTUAL</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-val" style="color:var(--cyan);">42</div>
+                        <div class="stat-key">NIVEL</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SHIPMENTS -->
+            <div class="shipments-title">Envíos Activos</div>
+            <div class="shipment-cards">
+                <div class="shipment-card">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                        <div class="shipment-name">Caja Génesis Neón</div>
+                        <span class="badge badge-rare shipment-badge" style="font-size:9px;">EN TRÁNSITO</span>
+                    </div>
+                    <div class="shipment-track">Rastreo: #X-DRP-8821</div>
+                    <div class="shipment-bar"><div class="shipment-fill fill-transit"></div></div>
+                    <div class="shipment-stages"><span>Despachado</span><span></span><span>ETA: 2 Días</span></div>
+                </div>
+                <div class="shipment-card">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                        <div class="shipment-name">Digital Alchemy Core</div>
+                        <span class="badge" style="background:rgba(240,192,64,0.15);color:var(--gold);border:1px solid rgba(240,192,64,0.4);font-size:9px;">PROCESANDO</span>
+                    </div>
+                    <div class="shipment-track">Rastreo: #X-DRP-9004</div>
+                    <div class="shipment-bar"><div class="shipment-fill fill-processing"></div></div>
+                    <div class="shipment-stages"><span>Verificando Activos</span><span></span><span>ETA: 5 Días</span></div>
+                </div>
+            </div>
+
+            <!-- VAULT -->
+            <div class="vault-title">
+                La Bóveda
+                <a onclick="showToast('CARGANDO HISTORIAL COMPLETO...')">Ver todo el historial</a>
+            </div>
+            <div class="vault-grid">
+                <div class="vault-item">
+                    <div class="vault-img">🏆
+                        <div style="position:absolute;top:6px;left:6px;"><span class="badge badge-legendary" style="font-size:8px;">LEGENDARIO</span></div>
+                    </div>
+                    <div class="vault-info">
+                        <div class="vault-name">Fragmento de Aetheria</div>
+                        <div class="vault-date">DESBLOQUEADO EL 24 OCT</div>
+                        <div class="vault-val">VALOR EST.: S/ 920.00</div>
+                    </div>
+                </div>
+                <div class="vault-item">
+                    <div class="vault-img">🎭
+                        <div style="position:absolute;top:6px;left:6px;"><span class="badge badge-epic" style="font-size:8px;">ÉPICO</span></div>
+                    </div>
+                    <div class="vault-info">
+                        <div class="vault-name">Máscara Void Runner</div>
+                        <div class="vault-date">DESBLOQUEADO EL 20 OCT</div>
+                        <div class="vault-val">VALOR EST.: S/ 450.00</div>
+                    </div>
+                </div>
+                <div class="vault-item">
+                    <div class="vault-img">🗝️
+                        <div style="position:absolute;top:6px;left:6px;"><span class="badge badge-rare" style="font-size:8px;">RARO</span></div>
+                    </div>
+                    <div class="vault-info">
+                        <div class="vault-name">Llave de Cifrado</div>
+                        <div class="vault-date">DESBLOQUEADO EL 18 OCT</div>
+                        <div class="vault-val">VALOR EST.: S/ 120.00</div>
+                    </div>
+                </div>
+                <div class="vault-item">
+                    <div class="vault-img">⌚
+                        <div style="position:absolute;top:6px;left:6px;"><span class="badge badge-common" style="font-size:8px;">COMÚN</span></div>
+                    </div>
+                    <div class="vault-info">
+                        <div class="vault-name">Pulso Estándar</div>
+                        <div class="vault-date">DESBLOQUEADO EL 15 OCT</div>
+                        <div class="vault-val">VALOR EST.: S/ 35.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-logo">X-DROPS</div>
+        <div class="footer-links"><a>Comunidad</a><a>Soporte</a><a>Legal</a><a>Privacidad</a></div>
+        <div class="footer-copy">© 2024 X-DROPS. ALQUIMIA DIGITAL DESATADA. TODOS LOS DERECHOS RESERVADOS.</div>
+    </footer>
+</div>
+
+<script>
+  // PAGE NAVIGATION
+  function goTo(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById('page-' + page);
+    if (target) {
+      target.classList.add('active');
+      window.scrollTo(0, 0);
+    }
+  }
+
+  // TOAST
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = '✓ ' + msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  // CART QUANTITY
+  function updateQty(btn, delta) {
+    const qv = btn.parentElement.querySelector('.qty-val');
+    let v = parseInt(qv.textContent);
+    v = Math.max(1, v + delta);
+    qv.textContent = String(v).padStart(2, '0');
+    showToast('CANTIDAD ACTUALIZADA');
+  }
+
+  // REMOVE ITEM
+  function removeItem(btn) {
+    btn.closest('.cart-item').style.opacity = '0';
+    btn.closest('.cart-item').style.transform = 'translateX(30px)';
+    btn.closest('.cart-item').style.transition = 'all .3s';
+    setTimeout(() => btn.closest('.cart-item').remove(), 300);
+    showToast('ITEM REMOVIDO DE LA BÓVEDA');
+  }
+
+  // DELIVERY SELECT
+  function selectDelivery(el) {
+    document.querySelectorAll('.delivery-opt').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  // PAYMENT METHOD TOGGLE
+  function togglePayMethod(el) {
+    document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // COMPLETE ORDER
+  function completeOrder() {
+    showToast('¡DROP COMPLETADO! BÓVEDA ACTUALIZADA');
+    setTimeout(() => goTo('profile'), 1200);
+  }
+
+  // COUNTDOWN
+  function runCountdown() {
+    const el = document.getElementById('countdown');
+    if (!el) return;
+    let [h,m,s] = el.textContent.split(':').map(Number);
+    setInterval(() => {
+      s--;
+      if (s < 0) { s = 59; m--; }
+      if (m < 0) { m = 59; h--; }
+      if (h < 0) { h = 0; m = 0; s = 0; }
+      el.textContent = [h,m,s].map(n=>String(n).padStart(2,'0')).join(':');
+    }, 1000);
+  }
+  runCountdown();
+
+  // FILTER TABS
+  document.querySelectorAll('.filter-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      showToast('FILTRO: ' + this.textContent.toUpperCase());
+    });
+  });
+
+  // SIDEBAR MENU
+  document.querySelectorAll('.sidebar-item').forEach(item => {
+    item.addEventListener('click', function() {
+      document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

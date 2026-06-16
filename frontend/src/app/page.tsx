@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+
 export default function HomePage() {
-  return <div>Mystery Boxes Peru — Home</div>;
+  redirect("/boxes");
 }

@@ -9,6 +9,16 @@ const envSchema = z.object({
   DATABASE_URL: z.string(),
   JWT_SECRET: z.string(),
   REDIS_URL: z.string().default('redis://localhost:6379'),
+  // Supabase
+  SUPABASE_URL: z.string(),
+  SUPABASE_ANON_KEY: z.string(),
+  SUPABASE_SERVICE_KEY: z.string(),
+  // MercadoPago
+  MP_ACCESS_TOKEN: z.string(),
+  MP_PUBLIC_KEY: z.string(),
+  MP_WEBHOOK_SECRET: z.string().default(''),
+  // App URLs
+  FRONTEND_URL: z.string().default('http://localhost:3000'),
 });
 
 export const env = envSchema.parse(process.env);

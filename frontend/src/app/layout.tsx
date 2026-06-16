@@ -1,12 +1,42 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Exo_2, Rajdhani, Share_Tech_Mono } from "next/font/google";
 import "./globals.css";
+import { ToastProvider } from "@/components/ui/Toast";
 
-const inter = Inter({ subsets: ["latin"] });
+const exo2 = Exo_2({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "900"],
+  variable: "--font-exo2",
+  display: "swap",
+});
+
+const rajdhani = Rajdhani({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-rajdhani",
+  display: "swap",
+});
+
+const shareTechMono = Share_Tech_Mono({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-mono-var",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "Mystery Boxes Peru",
-  description: "Cajas misteriosas temáticas con sorpresas curadas",
+  title: {
+    default: "X-DROPS — Alquimia Digital Desatada",
+    template: "%s | X-DROPS",
+  },
+  description:
+    "Desbloquea cajas misteriosas de edición limitada. Hardware, arte digital y artefactos de rareza extrema.",
+  keywords: ["mystery boxes", "drops", "coleccionables", "peru", "x-drops"],
+  openGraph: {
+    title: "X-DROPS — Alquimia Digital Desatada",
+    description: "Desbloquea cajas misteriosas de edición limitada.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -15,8 +45,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es">
-      <body className={inter.className}>{children}</body>
+    <html
+      lang="es"
+      className={`${exo2.variable} ${rajdhani.variable} ${shareTechMono.variable}`}
+    >
+      <body>
+        <ToastProvider>{children}</ToastProvider>
+      </body>
     </html>
   );
 }

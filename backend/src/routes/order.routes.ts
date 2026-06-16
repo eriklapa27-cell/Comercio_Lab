@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { orderController } from '@/controllers/order.controller';
 
-const router = Router();
+const router: import("express").Router = Router();
 
 /**
  * @openapi
