@@ -1,21 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Badge, Rarity } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { XpBar } from "@/components/ui/XpBar";
+import { useCart } from "@/context/CartContext";
+import { useToast } from "@/components/ui/Toast";
 
 const FILTERS = ["Todas las Colecciones", "Electrónica", "Ropa", "Artefactos"];
+const FILTER_KEYS = ["all", "electronica", "ropa", "artefactos"] as const;
+
 const SORTS = [
   "Rareza: Alta — Baja",
   "Precio: Alto — Bajo",
   "Precio: Bajo — Alto",
   "Más Reciente",
 ];
+
+const RARITY_WEIGHT: Record<string, number> = {
+  legendary: 4,
+  epic: 3,
+  rare: 2,
+  common: 1,
+};
 
 const PRODUCTS = [
   {
@@ -24,6 +36,7 @@ const PRODUCTS = [
     desc: "Periféricos mecánicos de alto rendimiento y equipo háptico de edición limitada.",
     price: 960,
     rarity: "legendary" as Rarity,
+    category: "electronica",
     emoji: "🎁",
     prob: "90% PROBABILIDAD DE RARA+",
     glow: "rgba(240,192,64,0.15)",
@@ -36,6 +49,7 @@ const PRODUCTS = [
     desc: "Hardware de sitio de última generación, unidades de almacenamiento modular y herramientas dev encriptadas.",
     price: 715,
     rarity: "epic" as Rarity,
+    category: "electronica",
     emoji: "📦",
     prob: "75% PROBABILIDAD DE RARA+",
     glow: "rgba(168,85,247,0.15)",
@@ -48,6 +62,7 @@ const PRODUCTS = [
     desc: "Tecnología de cuidado cyber-chic, pigmentos bioluminiscentes y wearables digitales.",
     price: 465,
     rarity: "epic" as Rarity,
+    category: "ropa",
     emoji: "✨",
     prob: "88% PROBABILIDAD DE RARA+",
     glow: "rgba(0,245,255,0.12)",
@@ -60,6 +75,7 @@ const PRODUCTS = [
     desc: "Equipo de tecnología digital y accesorios urbanos fantasma.",
     price: 380,
     rarity: "common" as Rarity,
+    category: "artefactos",
     emoji: "👻",
     prob: "",
     glow: "transparent",
@@ -73,6 +89,7 @@ const PRODUCTS = [
     desc: "Componentes esenciales y herramientas de utilidad digital de nivel de entrada.",
     price: 175,
     rarity: "common" as Rarity,
+    category: "electronica",
     emoji: "🔧",
     prob: "MÁS DE BASE",
     glow: "rgba(240,192,64,0.08)",
@@ -80,6 +97,15 @@ const PRODUCTS = [
     ctaVariant: "primary" as const,
   },
 ];
+
+const HERO_PRODUCT = {
+  id: "hero-1",
+  name: "PROTOCOLO OBSIDIAN PULSE",
+  series: "Drop Destacado // Vanguardia Virtual",
+  price: 960,
+  rarity: "legendary" as Rarity,
+  emoji: "🎁",
+};
 
 const container = {
   hidden: { opacity: 0 },
@@ -91,12 +117,47 @@ const item = {
 };
 
 export default function BoxesPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-[#050810]"><span className="font-mono text-[13px] tracking-[2px] text-[#4a5270]">CARGANDO...</span></div>}>
+      <BoxesContent />
+    </Suspense>
+  );
+}
+
+function BoxesContent() {
   const [activeFilter, setActiveFilter] = useState(0);
   const [activeSort, setActiveSort] = useState(0);
+  const { addItem } = useCart();
+  const { showToast } = useToast();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("sort") === "trending") {
+      setActiveSort(3);
+    }
+  }, [searchParams]);
+
+  const filteredProducts = PRODUCTS
+    .filter((p) => {
+      const key = FILTER_KEYS[activeFilter];
+      return key === "all" || p.category === key;
+    })
+    .sort((a, b) => {
+      if (activeSort === 0) return RARITY_WEIGHT[b.rarity] - RARITY_WEIGHT[a.rarity];
+      if (activeSort === 1) return b.price - a.price;
+      if (activeSort === 2) return a.price - b.price;
+      return Number(a.id) - Number(b.id);
+    });
+
+  const handleAddHero = () => {
+    addItem(HERO_PRODUCT);
+    showToast("✓ PROTOCOLO OBSIDIAN PULSE añadido a la bóveda");
+  };
 
   return (
     <div className="page-container">
-      <Navbar cartCount={2} />
+      <Navbar />
 
       {/* Hero */}
       <div className="relative overflow-hidden border-b border-[rgba(0,245,255,0.1)] bg-gradient-to-br from-[#0a0d1a] via-[#0f0820] to-[#0a0d1a] px-5 py-14 md:px-10 md:py-20">
@@ -123,9 +184,9 @@ export default function BoxesPage() {
             <Link href="/boxes/1">
               <Button variant="outline">REVELAR CONTENIDO</Button>
             </Link>
-            <Link href="/cart">
-              <Button variant="primary">AÑADIR A LA BOLSA</Button>
-            </Link>
+            <Button variant="primary" onClick={handleAddHero}>
+              AÑADIR A LA BOLSA
+            </Button>
           </div>
         </motion.div>
       </div>
@@ -172,9 +233,23 @@ export default function BoxesPage() {
         animate="show"
         className="mx-auto grid max-w-[1200px] grid-cols-1 gap-5 px-5 pb-16 sm:grid-cols-2 md:px-10 lg:grid-cols-3"
       >
-        {PRODUCTS.map((p) => (
+        {filteredProducts.length === 0 && (
+          <motion.div variants={item} className="col-span-full py-16 text-center">
+            <p className="font-display text-[18px] font-bold text-[#4a5270]">
+              No hay drops en esta categoría
+            </p>
+          </motion.div>
+        )}
+        {filteredProducts.map((p) => (
           <motion.div key={p.id} variants={item}>
-            <ProductCard product={p} />
+            <ProductCard
+              product={p}
+              onAdd={() => {
+                addItem({ id: p.id, name: p.name, series: p.desc, price: p.price, rarity: p.rarity, emoji: p.emoji });
+                showToast(`✓ ${p.name} añadido a la bóveda`);
+                router.push("/cart");
+              }}
+            />
           </motion.div>
         ))}
 
@@ -229,7 +304,15 @@ export default function BoxesPage() {
   );
 }
 
-function ProductCard({ product }: { product: (typeof PRODUCTS)[0] }) {
+function ProductCard({
+  product,
+  onAdd,
+}: {
+  product: (typeof PRODUCTS)[0];
+  onAdd: () => void;
+}) {
+  const showCta = product.cta === "COMPRAR DROP";
+
   return (
     <Link
       href={product.soldOut ? "#" : `/boxes/${product.id}`}
@@ -277,7 +360,20 @@ function ProductCard({ product }: { product: (typeof PRODUCTS)[0] }) {
             <span className="font-mono text-[10px] text-[#4a5270]">{product.prob}</span>
           )}
         </div>
-        <Button variant={product.ctaVariant} fullWidth disabled={product.soldOut}>
+        <Button
+          variant={product.ctaVariant}
+          fullWidth
+          disabled={product.soldOut}
+          onClick={
+            showCta
+              ? (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onAdd();
+                }
+              : undefined
+          }
+        >
           {product.cta}
         </Button>
       </div>

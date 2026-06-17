@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input, Select } from "@/components/ui/Input";
 import { XpBar } from "@/components/ui/XpBar";
+import { useCart } from "@/context/CartContext";
 
 const STEPS = ["Envío", "Pago", "Revisión"];
 
@@ -29,22 +30,18 @@ const DELIVERY_OPTIONS = [
   },
 ];
 
-const ORDER_ITEMS = [
-  { name: "Fragmento del Vacío #042", tier: "Artefacto Legendario", qty: 1, price: 1250, emoji: "🌑", rarity: "legendary" as const },
-  { name: "Estabilizador de Núcleo Neón", tier: "Componente Raro", qty: 1, price: 420, emoji: "⚡", rarity: "rare" as const },
-];
-
 export default function CheckoutPage() {
   const [delivery, setDelivery] = useState(0);
+  const { items } = useCart();
 
-  const subtotal = ORDER_ITEMS.reduce((a, it) => a + it.price * it.qty, 0);
+  const subtotal = items.reduce((a, it) => a + it.price * it.qty, 0);
   const tax = Math.round(subtotal * 0.05);
   const shipping = DELIVERY_OPTIONS[delivery].priceVal;
   const total = subtotal + tax + shipping;
 
   return (
     <div className="page-container">
-      <Navbar cartCount={2} />
+      <Navbar />
 
       <div className="mx-auto grid max-w-[1200px] gap-8 px-5 py-10 md:px-10 lg:grid-cols-[1fr_380px]">
         {/* Left */}
@@ -179,8 +176,11 @@ export default function CheckoutPage() {
           <div className="sticky top-[80px] rounded-[8px] border border-[rgba(0,245,255,0.12)] bg-[#141928] p-6">
             <h3 className="mb-5 font-display text-[18px] font-bold">Resumen del Pedido</h3>
 
-            {ORDER_ITEMS.map((it) => (
-              <div key={it.name} className="mb-4 flex items-center gap-3">
+            {items.length === 0 && (
+              <p className="mb-4 font-mono text-[11px] text-[#4a5270]">Tu bóveda está vacía</p>
+            )}
+            {items.map((it) => (
+              <div key={it.id} className="mb-4 flex items-center gap-3">
                 <div className="flex h-[52px] w-[52px] flex-shrink-0 items-center justify-center rounded-[4px] bg-gradient-to-br from-[#1a0a30] to-[#081525] text-[22px]">
                   {it.emoji}
                 </div>
@@ -188,7 +188,7 @@ export default function CheckoutPage() {
                   <Badge rarity={it.rarity} size="sm" className="mb-1" />
                   <p className="font-ui text-[13px] font-bold">{it.name}</p>
                   <p className="font-mono text-[10px] text-[#4a5270]">
-                    Tier: {it.tier} &nbsp; CANT: {it.qty}
+                    {it.series} &nbsp; CANT: {it.qty}
                   </p>
                   <p className="font-mono text-[14px] text-[#00f5ff]">
                     S/ {it.price.toFixed(2)}

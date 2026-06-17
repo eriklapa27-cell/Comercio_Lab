@@ -9,13 +9,18 @@ export function Footer() {
         </span>
 
         <div className="flex flex-wrap justify-center gap-5">
-          {["Comunidad", "Soporte", "Legal", "Privacidad"].map((item) => (
+          {[
+            { label: "Comunidad", href: "/comunidad" },
+            { label: "Soporte", href: "/soporte" },
+            { label: "Legal", href: "/legal" },
+            { label: "Privacidad", href: "/privacidad" },
+          ].map((item) => (
             <Link
-              key={item}
-              href="#"
+              key={item.label}
+              href={item.href}
               className="font-ui text-[13px] text-[#4a5270] transition-colors hover:text-[#e8eaf0]"
             >
-              {item}
+              {item.label}
             </Link>
           ))}
         </div>

@@ -71,12 +71,12 @@ export default function LoginPage() {
               <span className="font-mono text-[11px] uppercase tracking-[1.5px] text-[#8892aa]">
                 Contraseña
               </span>
-              <button
-                type="button"
+              <Link
+                href="/forgot-password"
                 className="font-mono text-[11px] uppercase tracking-[1px] text-[#00f5ff] transition-opacity hover:opacity-70"
               >
                 ¿Olvidaste?
-              </button>
+              </Link>
             </div>
             <Input type="password" placeholder="••••••••" required />
           </div>
@@ -105,15 +105,12 @@ export default function LoginPage() {
         </p>
 
         <div className="mt-5 flex justify-center gap-5 border-t border-[rgba(0,245,255,0.1)] pt-4">
-          {["PRIVACIDAD", "TÉRMINOS"].map((t) => (
-            <Link
-              key={t}
-              href="#"
-              className="font-mono text-[10px] tracking-[1px] text-[#4a5270] hover:text-[#8892aa]"
-            >
-              {t}
-            </Link>
-          ))}
+          <Link href="/privacidad" className="font-mono text-[10px] tracking-[1px] text-[#4a5270] hover:text-[#8892aa]">
+            PRIVACIDAD
+          </Link>
+          <Link href="/legal" className="font-mono text-[10px] tracking-[1px] text-[#4a5270] hover:text-[#8892aa]">
+            TÉRMINOS
+          </Link>
         </div>
       </motion.div>
     </div>

@@ -5,20 +5,18 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCart } from "@/context/CartContext";
 
 const navLinks = [
   { label: "Drops", href: "/boxes" },
   { label: "Tendencias", href: "/boxes?sort=trending" },
-  { label: "Mercado", href: "/boxes" },
+  { label: "Mercado", href: "/mercado" },
   { label: "Bóveda", href: "/dashboard" },
 ];
 
-interface NavbarProps {
-  cartCount?: number;
-}
-
-export function Navbar({ cartCount = 0 }: NavbarProps) {
+export function Navbar() {
   const pathname = usePathname();
+  const { count: cartCount } = useCart();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
@@ -73,6 +71,14 @@ export function Navbar({ cartCount = 0 }: NavbarProps) {
           )}
         </Link>
 
+        {/* Login */}
+        <Link
+          href="/login"
+          className="hidden items-center rounded-[6px] border border-[rgba(0,245,255,0.2)] bg-[rgba(0,245,255,0.06)] px-3.5 py-1.5 font-mono text-[11px] tracking-[1px] text-[#00f5ff] transition-all hover:border-[rgba(0,245,255,0.5)] hover:bg-[rgba(0,245,255,0.12)] md:flex"
+        >
+          ACCEDER
+        </Link>
+
         {/* Profile */}
         <Link
           href="/dashboard"
@@ -117,6 +123,15 @@ export function Navbar({ cartCount = 0 }: NavbarProps) {
                   className="w-full rounded-[4px] border border-[rgba(0,245,255,0.12)] bg-[rgba(255,255,255,0.04)] px-4 py-3 font-ui text-sm text-[#e8eaf0] outline-none placeholder:text-[#4a5270] focus:border-[#00f5ff]"
                   placeholder="Buscar en el catálogo..."
                 />
+              </div>
+              <div className="mt-2 border-t border-[rgba(0,245,255,0.12)] pt-2">
+                <Link
+                  href="/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="block rounded-[4px] border border-[rgba(0,245,255,0.2)] bg-[rgba(0,245,255,0.06)] px-4 py-3 text-center font-mono text-[13px] tracking-[1.5px] text-[#00f5ff] transition-all hover:bg-[rgba(0,245,255,0.1)]"
+                >
+                  ACCEDER / REGISTRARSE
+                </Link>
               </div>
             </div>
           </motion.div>

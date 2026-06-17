@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useToast } from "@/components/ui/Toast";
+import { useCart } from "@/context/CartContext";
 
 type UIState = "idle" | "loading" | "redirecting";
 
@@ -37,6 +38,7 @@ export default function PaymentPage() {
   const [uiState, setUiState] = useState<UIState>("idle");
   const [cardNumber, setCardNumber] = useState("");
   const { showToast } = useToast();
+  const { items, total, clearCart } = useCart();
 
   const formatCard = (val: string) =>
     val
@@ -49,6 +51,15 @@ export default function PaymentPage() {
 
   async function handleConfirm() {
     setUiState("loading");
+    const mpItems = items.length > 0
+      ? items.map((it) => ({
+          title: it.name,
+          quantity: it.qty,
+          unit_price: it.price,
+          currency_id: "PEN",
+        }))
+      : [{ title: "PAQUETE X-DROPS", quantity: 1, unit_price: 9250, currency_id: "PEN" }];
+
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/v1/payments/preference`,
@@ -56,16 +67,9 @@ export default function PaymentPage() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            items: [
-              {
-                title: "PAQUETE VOID-RUNNER",
-                quantity: 1,
-                unit_price: 9250,
-                currency_id: "PEN",
-              },
-            ],
+            items: mpItems,
             payer: { email: "cliente@example.com", name: "ALEX MERCER" },
-            orderId: "order-demo-001",
+            orderId: `order-${Date.now()}`,
           }),
         }
       );
@@ -74,6 +78,7 @@ export default function PaymentPage() {
 
       const data = await res.json();
       setUiState("redirecting");
+      clearCart();
       window.location.href = data.sandbox_init_point;
     } catch {
       setUiState("idle");
@@ -251,23 +256,43 @@ export default function PaymentPage() {
         {/* Summary */}
         <div>
           <div className="sticky top-[80px] rounded-[8px] border border-[rgba(0,245,255,0.12)] bg-[#141928] p-6">
-            {/* Item */}
-            <div className="mb-5 flex items-center gap-3">
-              <div className="flex h-[52px] w-[52px] flex-shrink-0 items-center justify-center rounded-[4px] bg-gradient-to-br from-[#1a0a30] to-[#081525] text-[22px]">
-                🎁
-              </div>
-              <div>
-                <Badge rarity="legendary" size="sm" className="mb-1" />
-                <p className="font-ui text-[14px] font-bold">PAQUETE VOID-RUNNER</p>
-                <p className="font-mono text-[16px] text-[#00f5ff]">S/. 9,250.00</p>
-              </div>
+            {/* Items */}
+            <div className="mb-4">
+              {items.length === 0 ? (
+                <div className="mb-5 flex items-center gap-3">
+                  <div className="flex h-[52px] w-[52px] flex-shrink-0 items-center justify-center rounded-[4px] bg-gradient-to-br from-[#1a0a30] to-[#081525] text-[22px]">
+                    🎁
+                  </div>
+                  <div>
+                    <Badge rarity="legendary" size="sm" className="mb-1" />
+                    <p className="font-ui text-[14px] font-bold">PAQUETE X-DROPS</p>
+                    <p className="font-mono text-[16px] text-[#00f5ff]">S/. 9,250.00</p>
+                  </div>
+                </div>
+              ) : (
+                items.map((it) => (
+                  <div key={it.id} className="mb-3 flex items-center gap-3">
+                    <div className="flex h-[52px] w-[52px] flex-shrink-0 items-center justify-center rounded-[4px] bg-gradient-to-br from-[#1a0a30] to-[#081525] text-[22px]">
+                      {it.emoji}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <Badge rarity={it.rarity} size="sm" className="mb-1" />
+                      <p className="font-ui text-[13px] font-bold leading-tight">{it.name}</p>
+                      <p className="font-mono text-[10px] text-[#4a5270]">x{it.qty}</p>
+                      <p className="font-mono text-[13px] text-[#00f5ff]">
+                        S/ {(it.price * it.qty).toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
 
             <div className="border-t border-[rgba(0,245,255,0.12)] pt-4">
               {[
-                { label: "Subtotal", val: "S/. 9,250.00" },
-                { label: "Tarifa de Gas de Red", val: "S/. 7.50" },
-                { label: "Tarifa de Plataforma", val: "S/. 0.00" },
+                { label: "Subtotal", val: `S/ ${(items.length > 0 ? total : 9250).toFixed(2)}` },
+                { label: "Tarifa de Gas de Red", val: "S/ 7.50" },
+                { label: "Tarifa de Plataforma", val: "S/ 0.00" },
               ].map((r) => (
                 <div key={r.label} className="mb-2.5 flex justify-between font-ui text-[14px]">
                   <span className="text-[#8892aa]">{r.label}</span>
@@ -277,7 +302,7 @@ export default function PaymentPage() {
               <div className="mt-4 flex items-center justify-between border-t border-[rgba(0,245,255,0.12)] pt-4">
                 <span className="font-display text-[18px] font-bold">Total</span>
                 <span className="font-mono text-[24px] font-bold text-[#00f5ff]">
-                  S/. 9,257.50
+                  S/ {(items.length > 0 ? total + 7.5 : 9257.5).toFixed(2)}
                 </span>
               </div>
             </div>

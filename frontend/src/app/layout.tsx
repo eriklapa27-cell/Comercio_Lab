@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Exo_2, Rajdhani, Share_Tech_Mono } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/Toast";
+import { CartProvider } from "@/context/CartContext";
 
 const exo2 = Exo_2({
   subsets: ["latin"],
@@ -50,7 +51,9 @@ export default function RootLayout({
       className={`${exo2.variable} ${rajdhani.variable} ${shareTechMono.variable}`}
     >
       <body>
-        <ToastProvider>{children}</ToastProvider>
+        <CartProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </CartProvider>
       </body>
     </html>
   );

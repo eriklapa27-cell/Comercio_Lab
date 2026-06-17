@@ -3,10 +3,13 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { useCart } from "@/context/CartContext";
+import { useToast } from "@/components/ui/Toast";
 
 const REWARDS = [
   { name: "Catalizador Neón", rarity: "epic" as const, drop: "0.5%", emoji: "🌀" },
@@ -35,6 +38,22 @@ const THUMBS = ["🎁", "🔮", "⚡", "+12"];
 export default function BoxDetailPage(_props: { params: { id: string } }) {
   const [activeThumb, setActiveThumb] = useState(0);
   const [time, setTime] = useState({ h: 4, m: 12, s: 55 });
+  const { addItem } = useCart();
+  const { showToast } = useToast();
+  const router = useRouter();
+
+  const handleMint = () => {
+    addItem({
+      id: "box-alquimista",
+      name: "LA BÓVEDA DEL ALQUIMISTA",
+      series: "Edición Legendaria // Contrato 0x8a1c...F92b",
+      price: 25000,
+      rarity: "legendary",
+      emoji: "🎁",
+    });
+    showToast("✓ LA BÓVEDA DEL ALQUIMISTA añadida a la bóveda");
+    router.push("/checkout");
+  };
 
   useEffect(() => {
     const t = setInterval(() => {
@@ -54,7 +73,7 @@ export default function BoxDetailPage(_props: { params: { id: string } }) {
 
   return (
     <div className="page-container">
-      <Navbar cartCount={2} />
+      <Navbar />
 
       {/* Breadcrumb */}
       <div className="border-b border-[rgba(0,245,255,0.08)] px-5 py-4 md:px-10">
@@ -153,9 +172,7 @@ export default function BoxDetailPage(_props: { params: { id: string } }) {
               </p>
 
               <div className="mb-4 grid grid-cols-2 gap-2.5">
-                <Link href="/checkout">
-                  <Button variant="primary" fullWidth>⚡ MINTEAR AHORA</Button>
-                </Link>
+                <Button variant="primary" fullWidth onClick={handleMint}>⚡ MINTEAR AHORA</Button>
                 <Button variant="outline">🔖 HACER OFERTA</Button>
               </div>
 

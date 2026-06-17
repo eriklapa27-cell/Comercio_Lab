@@ -5,40 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { Badge, Rarity } from "@/components/ui/Badge";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
-
-interface CartItem {
-  id: string;
-  name: string;
-  series: string;
-  price: number;
-  qty: number;
-  rarity: Rarity;
-  emoji: string;
-}
-
-const INITIAL_ITEMS: CartItem[] = [
-  {
-    id: "1",
-    name: "PROTO-NÚCLEO ALPHA",
-    series: "Serie 01 // Extracción Limitada",
-    price: 9800,
-    qty: 1,
-    rarity: "legendary",
-    emoji: "🎁",
-  },
-  {
-    id: "2",
-    name: "FRAGMENTO NEÓN #88",
-    series: "Nodo de Extracción // Protocolo Estándar",
-    price: 3400,
-    qty: 2,
-    rarity: "rare",
-    emoji: "💎",
-  },
-];
+import { useCart } from "@/context/CartContext";
 
 const UPCOMING = [
   { name: "RELIQUIA DEL VACÍO #09", emoji: "🌑", locked: false },
@@ -48,21 +18,17 @@ const UPCOMING = [
 ];
 
 export default function CartPage() {
-  const [items, setItems] = useState<CartItem[]>(INITIAL_ITEMS);
+  const { items, removeItem: ctxRemove, updateQty: ctxUpdateQty } = useCart();
   const [promoCode, setPromoCode] = useState("");
   const { showToast } = useToast();
 
   const updateQty = (id: string, delta: number) => {
-    setItems((prev) =>
-      prev.map((it) =>
-        it.id === id ? { ...it, qty: Math.max(1, it.qty + delta) } : it
-      )
-    );
+    ctxUpdateQty(id, delta);
     showToast("CANTIDAD ACTUALIZADA");
   };
 
   const removeItem = (id: string) => {
-    setItems((prev) => prev.filter((it) => it.id !== id));
+    ctxRemove(id);
     showToast("ITEM REMOVIDO DE LA BÓVEDA", "error");
   };
 
@@ -73,7 +39,7 @@ export default function CartPage() {
 
   return (
     <div className="page-container">
-      <Navbar cartCount={items.length} />
+      <Navbar />
 
       <div className="mx-auto grid max-w-[1200px] gap-8 px-5 py-10 md:px-10 lg:grid-cols-[1fr_380px]">
         {/* Left */}

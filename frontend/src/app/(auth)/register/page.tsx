@@ -64,11 +64,11 @@ export default function RegisterPage() {
           <label className="flex cursor-pointer items-center gap-2.5 font-ui text-[13px] text-[#8892aa]">
             <input type="checkbox" required className="accent-[#00f5ff]" />
             Acepto los{" "}
-            <Link href="#" className="text-[#00f5ff] hover:underline">
+            <Link href="/legal" className="text-[#00f5ff] hover:underline">
               Términos de Servicio
             </Link>{" "}
             y{" "}
-            <Link href="#" className="text-[#00f5ff] hover:underline">
+            <Link href="/privacidad" className="text-[#00f5ff] hover:underline">
               Privacidad
             </Link>
           </label>
